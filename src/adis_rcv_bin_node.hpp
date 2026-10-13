@@ -98,6 +98,11 @@ class ImuNodeRcvBin : public rclcpp::Node
       r.sleep();
     }
 
+    // The board may still be waiting for the rest of a frame it got from a
+    // previous session (e.g. bytes echoed by a non-raw tty); pad it out first
+    // so the stop and settings commands below are actually parsed.
+    imu_.ResyncParser();
+
     // Stop any ongoing telemetry and flush
     imu_.StopTelemetry();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
